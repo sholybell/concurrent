@@ -1,0 +1,42 @@
+package com.syb.concurrent.concurrent_collection_demo;
+
+import java.util.concurrent.ConcurrentLinkedDeque;
+
+/**
+ * 举例非阻塞的线程安全容器
+ */
+public class ConcurrentLinkedDequeDemo {
+
+    public static void main(String[] args) throws InterruptedException {
+        ConcurrentLinkedDeque<String> list = new ConcurrentLinkedDeque<>();
+        // 添加数据
+        Thread[] add = new Thread[100];
+        for (int i = 0; i < add.length; i++) {
+            add[i] = new Thread(() -> {
+                for (int j = 0; j < 10000; j++) {
+                    list.add(Thread.currentThread().getName() + ":Element " + j);
+                }
+            });
+            add[i].start();
+            add[i].join();
+        }
+
+        System.out.println("after add size:" + list.size());
+
+        // 移除数据
+        Thread[] poll = new Thread[100];
+        for (int i = 0; i < 100; i++) {
+            poll[i] = new Thread(() -> {
+                for (int j = 0; j < 5000; j++) {
+                    list.pollLast();
+                    list.pollFirst();
+                }
+            });
+            poll[i].start();
+            poll[i].join();
+        }
+        System.out.println("after poll size:" + list.size());
+    }
+
+
+}
